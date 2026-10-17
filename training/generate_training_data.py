@@ -1,181 +1,236 @@
 """
 Synthetic Training Dataset Generator for MendSeed AI.
-Generates `mendseed_training_data.jsonl` covering all 5 Pydantic contracts:
-1. IssueAnalysis
-2. IssueComparison
+MendSeed is a public grievance observatory that collects real-world problems across sectors
+(agriculture, civic infrastructure, healthcare, education, logistics, public services)
+and formats them for builders, researchers, and hackathon teams looking for real problems to solve.
+
+Generates `training/mendseed_training_data.jsonl` covering all 5 Pydantic contracts:
+1. GrievanceAnalysis (IssueAnalysis)
+2. GrievanceComparison (IssueComparison)
 3. CommunitySummary
-4. DeveloperBrief
-5. MergeProposal
+4. BuilderBrief (DeveloperBrief)
+5. CanonicalClusterProposal (MergeProposal)
 """
 
 import json
 import os
 import sys
 
-# Ensure sdk contracts can be imported
+# Ensure sdk directory is in Python path
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 SDK_DIR = os.path.join(os.path.dirname(CURRENT_DIR), "sdk")
 if SDK_DIR not in sys.path:
     sys.path.insert(0, SDK_DIR)
 
 
-def generate_dataset(output_path: str = "mendseed_training_data.jsonl"):
+def generate_dataset(output_path: str = "training/mendseed_training_data.jsonl"):
     examples = [
-        # 1. IssueAnalysis examples
+        # -------------------------------------------------------------
+        # 1. GrievanceAnalysis: Agriculture / Perishable Harvest Spoilage
+        # -------------------------------------------------------------
         {
             "system": (
-                "You are MendSeed AI, an issue-intelligence assistant. "
-                "Return ONLY valid JSON matching the IssueAnalysis schema: "
-                "category ('Bug' | 'Feature Request' | 'Inquiry'), normalized_title, summary, "
-                "affected_area, reproducible_details, missing_information, confidence."
+                "You are MendSeed AI, an issue-intelligence assistant for a public grievance observatory. "
+                "Extract structured data from raw citizen reports across diverse sectors. "
+                "Return ONLY valid JSON matching the GrievanceAnalysis schema: "
+                "category ('Civic & Public Infrastructure' | 'Agriculture & Rural Development' | "
+                "'Healthcare & Sanitation' | 'Education & Skilling' | 'Environment & Waste Management' | "
+                "'Transportation & Mobility' | 'Public Services & Local Governance' | 'Livelihoods & Daily Life' | 'Other Grievance'), "
+                "normalized_title, summary, affected_sector, location_or_demographic, observed_friction, "
+                "current_workarounds, missing_information, confidence."
             ),
-            "input": "My map freezes when location services are set to high accuracy. Samsung S21 with Android 13.",
+            "input": (
+                "In our block (Kolar district), tomato farmers lose up to 40% of their harvest every June "
+                "because there is no solar cold room or refrigerated transit to the wholesale mandi 60km away. "
+                "Middlemen exploit this by buying crates at distress prices (Rs 3/kg)."
+            ),
             "output": json.dumps({
-                "category": "Bug",
-                "normalized_title": "Map freezes on high accuracy GPS",
-                "summary": "Application map interface freezes when location services are switched to high accuracy on Samsung S21.",
-                "affected_area": "Map / Geolocation",
-                "reproducible_details": "Samsung S21 running Android 13 with high accuracy location enabled.",
-                "missing_information": [],
+                "category": "Agriculture & Rural Development",
+                "normalized_title": "Lack of decentralized cold storage causes tomato harvest distress sales",
+                "summary": "Farmers in Kolar lose up to 40% of tomato harvests due to absent localized cold storage and cold-chain transit to wholesale markets.",
+                "affected_sector": "Post-Harvest Agriculture & Cold-Chain Logistics",
+                "location_or_demographic": "Kolar district tomato farming community",
+                "observed_friction": "Absence of localized or solar-powered cold storage leading to rapid perishability within 48 hours.",
+                "current_workarounds": "Selling at distress prices (Rs 3/kg) to predatory intermediaries.",
+                "missing_information": ["Daily produce volume during peak harvest", "Grid power reliability in block"],
+                "confidence": 0.96
+            })
+        },
+
+        # -------------------------------------------------------------
+        # 2. GrievanceAnalysis: Civic Infrastructure / Water Contamination
+        # -------------------------------------------------------------
+        {
+            "system": (
+                "You are MendSeed AI, an issue-intelligence assistant for a public grievance observatory. "
+                "Extract structured data from raw citizen reports across diverse sectors. "
+                "Return ONLY valid JSON matching the GrievanceAnalysis schema: "
+                "category, normalized_title, summary, affected_sector, location_or_demographic, "
+                "observed_friction, current_workarounds, missing_information, confidence."
+            ),
+            "input": (
+                "Our municipal tap water in Ward 14 turns brownish and smells like sewage every Tuesday morning. "
+                "Over 80 households report children getting stomach infections. Ward office says pipes are old."
+            ),
+            "output": json.dumps({
+                "category": "Civic & Public Infrastructure",
+                "normalized_title": "Sewage infiltration into municipal drinking water pipeline",
+                "summary": "Weekly sewage contamination in municipal drinking supply causing recurring gastrointestinal infections in 80+ families in Ward 14.",
+                "affected_sector": "Urban Water Supply & Public Sanitation",
+                "location_or_demographic": "Ward 14 residents (approx. 80 households)",
+                "observed_friction": "Negative pressure in aging water lines drawing in adjacent drainage leakage during non-supply hours.",
+                "current_workarounds": "Boiling contaminated water or purchasing private RO tanker water.",
+                "missing_information": ["Specific street intersections where line crossings occur", "Water sample lab test report"],
                 "confidence": 0.95
             })
         },
+
+        # -------------------------------------------------------------
+        # 3. GrievanceAnalysis: Healthcare / Remote Emergency Care
+        # -------------------------------------------------------------
         {
             "system": (
-                "You are MendSeed AI, an issue-intelligence assistant. "
-                "Return ONLY valid JSON matching the IssueAnalysis schema: "
-                "category ('Bug' | 'Feature Request' | 'Inquiry'), normalized_title, summary, "
-                "affected_area, reproducible_details, missing_information, confidence."
+                "You are MendSeed AI, an issue-intelligence assistant for a public grievance observatory. "
+                "Extract structured data from raw citizen reports across diverse sectors. "
+                "Return ONLY valid JSON matching the GrievanceAnalysis schema: "
+                "category, normalized_title, summary, affected_sector, location_or_demographic, "
+                "observed_friction, current_workarounds, missing_information, confidence."
             ),
-            "input": "Can we get a dark mode option for the dashboard? White background hurts my eyes at night.",
+            "input": (
+                "Primary health sub-centre at Dhankuta has no antivenom vials in stock during monsoon. "
+                "A farmer bitten by a viper had to travel 3 hours on dirt roads to district hospital and died on the way."
+            ),
             "output": json.dumps({
-                "category": "Feature Request",
-                "normalized_title": "Add dark mode theme support to dashboard",
-                "summary": "User requests a dark theme for the community dashboard to reduce eye strain in low-light environments.",
-                "affected_area": "UI / Dashboard",
-                "reproducible_details": None,
-                "missing_information": [],
+                "category": "Healthcare & Sanitation",
+                "normalized_title": "Primary health centre lacks anti-snake venom and emergency cold storage",
+                "summary": "Fatal delay in snakebite envenomation management due to stock-outs of antivenom vials and lack of cold storage at peripheral health centres.",
+                "affected_sector": "Rural Emergency Healthcare & Medical Supply Chain",
+                "location_or_demographic": "Dhankuta sub-centre catchment area (agricultural laborers)",
+                "observed_friction": "Stock-out of temperature-sensitive antivenom at primary point of care during peak monsoon bite season.",
+                "current_workarounds": "Hazardous 3-hour emergency transit over unpaved roads to distant district facility.",
+                "missing_information": ["Primary health centre electrification status", "Frequency of snakebite incidents per season"],
                 "confidence": 0.98
             })
         },
+
+        # -------------------------------------------------------------
+        # 4. GrievanceComparison: Real-World Public Transportation
+        # -------------------------------------------------------------
         {
             "system": (
-                "You are MendSeed AI, an issue-intelligence assistant. "
-                "Return ONLY valid JSON matching the IssueAnalysis schema: "
-                "category ('Bug' | 'Feature Request' | 'Inquiry'), normalized_title, summary, "
-                "affected_area, reproducible_details, missing_information, confidence."
+                "You are MendSeed AI. Compare two community problem reports to identify shared systemic causes. "
+                "Return ONLY valid JSON matching GrievanceComparison schema: "
+                "relationship ('Same underlying problem' | 'Related problem in same domain' | 'Distinct problem' | 'Insufficient information'), "
+                "evidence, matching_score, meaningful_differences, recommended_action."
             ),
-            "input": "How do I share heirloom tomato seeds with growers in my neighborhood zip code?",
+            "input": (
+                "Grievance A: Rural feeder buses from Taluka headquarter stop running at 6 PM, forcing women garment factory workers on evening shifts to walk 8 km in the dark.\n"
+                "Grievance B: Public transport schedule ignores industrial estate shift change at 7:30 PM; female textile workers face severe safety hazards commuting home."
+            ),
             "output": json.dumps({
-                "category": "Inquiry",
-                "normalized_title": "How to initiate local seed sharing by zip code",
-                "summary": "User seeks guidance on how to exchange heirloom seeds with nearby growers based on postal location.",
-                "affected_area": "Seed Exchange / Discovery",
-                "reproducible_details": None,
-                "missing_information": [],
-                "confidence": 0.94
+                "relationship": "Same underlying problem",
+                "evidence": [
+                    "Both reports identify public transport schedules unaligned with women industrial worker shift timings.",
+                    "Both highlight extreme vulnerability and lack of last-mile mobility after dark."
+                ],
+                "matching_score": 0.91,
+                "meaningful_differences": ["Grievance A specifies 6 PM cutoff and 8 km distance; Grievance B highlights the specific 7:30 PM factory shift change."],
+                "recommended_action": "cluster_under_canonical"
             })
         },
 
-        # 2. IssueComparison examples
+        # -------------------------------------------------------------
+        # 5. BuilderBrief: Hackathon & Project Problem Definition
+        # -------------------------------------------------------------
         {
             "system": (
-                "You are MendSeed AI. Compare two community issue reports. Return ONLY valid JSON matching "
-                "IssueComparison schema: relationship ('Same underlying issue' | 'Related issue' | "
-                "'Distinct issue' | 'Insufficient information'), evidence, matching_score, "
-                "meaningful_differences, recommended_action."
+                "You are MendSeed AI. Generate an actionable BuilderBrief for hackathon teams, researchers, and project creators "
+                "looking for real-world problems to solve. Return ONLY valid JSON matching BuilderBrief schema: "
+                "problem_statement, target_beneficiaries, current_ground_reality, impact, solution_opportunities, unresolved_questions."
             ),
             "input": (
-                "Report A: Map view locks up when zooming in on city center.\n"
-                "Report B: Zooming in past level 16 causes the entire application interface to freeze."
+                "Problem: Street vendors in small towns pay 10% daily interest (call money) to informal money lenders "
+                "for working capital of Rs 1,000 - 3,000 every single morning to buy vegetables."
             ),
             "output": json.dumps({
-                "relationship": "Same underlying issue",
-                "evidence": ["Both reports indicate UI freeze specifically triggered by map zooming operations."],
-                "matching_score": 0.89,
-                "meaningful_differences": ["Report B provides a specific zoom threshold (level 16)."],
-                "recommended_action": "link_duplicate"
-            })
-        },
-
-        # 3. CommunitySummary examples
-        {
-            "system": (
-                "You are MendSeed AI. Synthesize recurring problems across community reports. "
-                "Return ONLY valid JSON matching CommunitySummary schema: main_problems, "
-                "recurring_themes, disagreements, evidence_backed_feedback."
-            ),
-            "input": (
-                "Reports:\n"
-                "1. Soil test upload rejects PDF documents larger than 2MB.\n"
-                "2. Uploading photo of my garden returns timeout error on 4G connection.\n"
-                "3. Image upload fails silently without error message."
-            ),
-            "output": json.dumps({
-                "main_problems": ["File and photo uploads fail or time out under low bandwidth or moderate file sizes."],
-                "recurring_themes": ["Asset ingestion pipeline fragility", "Missing client-side error notifications"],
-                "disagreements": [],
-                "evidence_backed_feedback": [
-                    "2MB PDF size limit exceeded",
-                    "Timeout on 4G cellular connection",
-                    "Silent failure on image upload"
-                ]
-            })
-        },
-
-        # 4. DeveloperBrief examples
-        {
-            "system": (
-                "You are MendSeed AI. Generate a concise DeveloperBrief for software maintainers. "
-                "Return ONLY valid JSON matching DeveloperBrief schema: problem_statement, "
-                "expected_behavior, actual_behavior, impact, reproduction_steps, unresolved_questions."
-            ),
-            "input": (
-                "Canonical Title: Seed swap transaction fails with out of stock error despite counter showing 5\n"
-                "Evidence: Users clicked 'Request Seed', counter showed 5 available, error prompt 'Item no longer in inventory'."
-            ),
-            "output": json.dumps({
-                "problem_statement": "Race condition in inventory counter decrements during concurrent swap requests.",
-                "expected_behavior": "Available stock displays accurate real-time inventory or gracefully locks during checkout.",
-                "actual_behavior": "Counter shows positive quantity but checkout throws inventory exhaustion error.",
-                "impact": "Blocks legitimate exchanges and causes user distrust in platform inventory accuracy.",
-                "reproduction_steps": [
-                    "Navigate to listing with low remaining inventory",
-                    "Simultaneously initiate two requests from different accounts",
-                    "Observe out-of-stock failure on one request"
+                "problem_statement": "Daily micro-working capital deficit forcing street vendors into predatory informal credit cycles (10% daily interest rates).",
+                "target_beneficiaries": "Urban and semi-urban daily micro-vendors, roadside vegetable and fruit sellers.",
+                "current_ground_reality": "Formal microfinance and banks require documentation and multi-day disbursement cycles unsuited for morning wholesale purchase needs (5 AM cash requirement repaid by 8 PM).",
+                "impact": "Vendors lose 20-30% of daily livelihood profit to loan sharks, preventing wealth accumulation.",
+                "solution_opportunities": [
+                    "Intraday UPI-based automated micro-credit pool with instant sunset repayment at market close.",
+                    "Community rotating savings and credit association (ROSCA) smartphone coordination tool.",
+                    "Cooperative bulk purchasing system to bypass individual morning cash constraints."
                 ],
                 "unresolved_questions": [
-                    "Are inventory deductions wrapped in an atomic SQL row lock (SELECT FOR UPDATE)?"
+                    "What percentage of targeted vendors possess active UPI-linked smartphones?",
+                    "What default mitigation mechanisms work within vendor community trust networks?"
                 ]
             })
         },
 
-        # 5. MergeProposal examples
+        # -------------------------------------------------------------
+        # 6. CommunitySummary: Public Grievance Aggregation
+        # -------------------------------------------------------------
         {
             "system": (
-                "You are MendSeed AI. Evaluate merge proposals. "
-                "Return ONLY valid JSON matching MergeProposal schema: candidate_canonical_issue_id, "
-                "proposed_duplicate_links, supporting_evidence, uncertainty_level, human_review_required."
+                "You are MendSeed AI. Synthesize recurring community grievances across multiple reports. "
+                "Return ONLY valid JSON matching CommunitySummary schema: "
+                "main_problems, recurring_themes, disagreements, evidence_backed_feedback."
             ),
             "input": (
-                "New Report: Can't reset password because verification email never arrives in inbox or spam.\n"
-                "Candidates: [{'id': 'CANON-104', 'title': 'Transactional signup and reset emails delayed by 45 minutes'}]"
+                "Public Reports:\n"
+                "1. Potholes on NH-24 service road caused 4 two-wheeler skid accidents after light rain.\n"
+                "2. Open drainage trench dug by telecom contractors left unfilled for 3 weeks near school entrance.\n"
+                "3. Road repair gravel dumped loosely without asphalt roller, causing bike skids."
             ),
             "output": json.dumps({
-                "candidate_canonical_issue_id": "CANON-104",
-                "proposed_duplicate_links": ["CANON-104"],
-                "supporting_evidence": "Both reports stem from transactional email delivery delays/failures in the authentication flow.",
+                "main_problems": [
+                    "Uncoordinated utility trenching and uncompacted aggregate gravel creating critical physical hazards on arterial roads."
+                ],
+                "recurring_themes": [
+                    "Lack of inter-agency coordination between municipal road department and private utility contractors.",
+                    "Vulnerability of two-wheeler riders and schoolchildren."
+                ],
+                "disagreements": [],
+                "evidence_backed_feedback": [
+                    "4 verified two-wheeler skid accidents post-rain on NH-24 service lane",
+                    "3-week unbarricaded trench outside school gate"
+                ]
+            })
+        },
+
+        # -------------------------------------------------------------
+        # 7. CanonicalClusterProposal: Clustering Grievances
+        # -------------------------------------------------------------
+        {
+            "system": (
+                "You are MendSeed AI. Evaluate whether incoming citizen grievances cluster under a canonical real-world problem statement. "
+                "Return ONLY valid JSON matching CanonicalClusterProposal schema: "
+                "candidate_canonical_problem_id, proposed_grievance_links, supporting_evidence, uncertainty_level, human_review_required."
+            ),
+            "input": (
+                "Incoming Grievance: Tubewell in Ward 8 is pumping high salinity water, children developing kidney gravel.\n"
+                "Canonical Issues: [{'id': 'PROB-GW-204', 'title': 'Groundwater table depletion leading to dangerous fluoride and TDS concentration in sub-district aquifers'}]"
+            ),
+            "output": json.dumps({
+                "candidate_canonical_problem_id": "PROB-GW-204",
+                "proposed_grievance_links": ["PROB-GW-204"],
+                "supporting_evidence": "Groundwater mineralization and kidney health complications directly stem from sub-aquifer depletion captured in PROB-GW-204.",
                 "uncertainty_level": "Low",
                 "human_review_required": True
             })
         }
     ]
 
+    # Ensure target directory exists
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
     with open(output_path, "w", encoding="utf-8") as f:
         for ex in examples:
             f.write(json.dumps(ex) + "\n")
 
-    print(f"Dataset successfully created with {len(examples)} examples: {output_path}")
+    print(f"MendSeed Public Grievance Dataset created with {len(examples)} examples: {output_path}")
 
 
 if __name__ == "__main__":

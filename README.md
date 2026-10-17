@@ -5,22 +5,24 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com)
 [![Pydantic v2](https://img.shields.io/badge/Pydantic-v2-E92063.svg?logo=pydantic)](https://docs.pydantic.dev/)
 
-**MendSeed AI** is the issue-intelligence and temporal evidence ranking layer for [MendSeed](https://github.com/itsjustayush/mendseed)—a community platform that captures unstructured real-world problem reports, connects citizens with shared grievances, and distills them into developer-actionable briefs.
+**MendSeed AI** powers [MendSeed](https://github.com/MendSeed)—a **public grievance observatory and real-world problem discovery platform**. 
+
+MendSeed listens to the lived grievances and everyday struggles of citizens across different sectors (agriculture, civic infrastructure, healthcare, education, sanitation, transport, local governance) and structures them into **actionable problem briefs for builders, student researchers, and hackathon participants** seeking genuine problems worth solving.
 
 ---
 
 ## 🏛️ Two-Layer Decoupled Architecture
 
-To prevent heavy ML libraries (`torch`, `transformers`, `peft`, `bitsandbytes` — over 4 GB) from bloating user environments and the core MendSeed codebase, the repository is split into two clean layers:
+To prevent heavy ML libraries (`torch`, `transformers`, `peft`, `bitsandbytes` — over 4.5 GB) from bloating user environments and the core MendSeed platform, the repository is split into two clean layers:
 
 ```
 mendseed-ai/
-├── README.md                      # Architecture, QuietFlay v0.1 math, & quickstart
+├── README.md                      # Platform mission, QuietFlay v0.1 math, & quickstart
 ├── .gitignore                     # Blocks credentials, checkpoints, & raw datasets
 ├── .agents/rules/                 # Antigravity IDE workspace rules
 │   └── mendseed-architecture.md
 │
-├── sdk/                           # 📦 ZERO-ML CLIENT SDK (For MendSeed Core App)
+├── sdk/                           # 📦 ZERO-ML CLIENT SDK (For MendSeed Core Platform)
 │   ├── pyproject.toml             # Only depends on: pydantic>=2.0, httpx>=0.27
 │   └── mendseed_ai/
 │       ├── __init__.py            # Clean exports of schemas, engine, & client
@@ -33,11 +35,12 @@ mendseed-ai/
 │   ├── vercel.json                # Zero-config 24/7 Vercel serverless deployment
 │   ├── Dockerfile                 # Optional container deployment (Render, Fly.io, Cloud Run)
 │   ├── .env.example               # Configuration template
-│   └── main.py                    # Authenticated REST API & proxy
+│   └── main.py                    # Authenticated REST API & remote inference router
 │
 └── training/                      # 🧠 GPU TRAINING WORKSHOP (Run on Colab / Kaggle T4)
     ├── requirements.txt           # GPU dependencies (torch, peft, trl, bitsandbytes)
-    ├── generate_training_data.py  # Synthetic dataset generator for 5 schemas
+    ├── generate_training_data.py  # Synthetic dataset generator across diverse sectors
+    ├── mendseed_training_data.jsonl
     └── train_qlora.py             # T4-optimized FP16 QLoRA fine-tuning script
 ```
 
@@ -45,12 +48,12 @@ mendseed-ai/
 
 ## 🧮 QuietFlay v0.1: Temporal Evidence Ranking Engine
 
-Traditional issue boards rely on **raw net votes** ($U - D$) or naive recency decay, which are easily manipulated by Sybil spikes, copy-paste spam, or legacy monopolies.
+Traditional community boards rely on **raw net votes** ($U - D$) or naive recency decay, which are easily manipulated by bot spikes or sudden viral outrage while ignoring chronic, quiet suffering.
 
-**QuietFlay v0.1** introduces a dual-kernel Hawkes excitation process with marked event updates to distinguish **transient viral spikes ($H_0$)** from **persistent unresolved friction ($H_1$)**:
+**QuietFlay v0.1** introduces a dual-kernel Hawkes excitation process with marked event updates to distinguish **transient viral spikes ($H_0$)** from **persistent unresolved community friction ($H_1$)**:
 
 ### 1. Dual-Decay Branching Mass
-For an issue observing event arrivals at times $t_j$ with quality marks $q_j$:
+For a grievance observing citizen report arrivals at times $t_j$ with quality marks $q_j$:
 $$x_{m,k}(t) = \sum_{j: t_j < t} q_j \cdot \exp\left(-\frac{t - t_j}{\tau_k}\right), \quad k \in \{f, s\}$$
 
 - **Fast Kernel ($\tau_f = 0.02\text{ days} \approx 28.8\text{ min}$):** Rapidly decays immediate coordination spikes and duplicate bursts.
@@ -61,8 +64,7 @@ $$x_{m,k}(t) = \sum_{j: t_j < t} q_j \cdot \exp\left(-\frac{t - t_j}{\tau_k}\rig
 ### 2. $O(1)$ Constant-Time Streaming Recurrence
 QuietFlay updates in constant arithmetic operations per event without rescanning historical database rows:
 $$\Delta I = \sum_{k \in \{f,s\}} (\alpha_{1,k} - \alpha_{0,k}) x_k \tau_k [-\operatorname{expm1}(-\Delta / \tau_k)]$$
-$$\text{LLR} \leftarrow \text{LLR} - \Delta I + \log\frac{\lambda_1(t^-)}{\lambda_0(t^-)}$$
-$$x_k \leftarrow x_k + q_j$$
+$$\text{LLR} \leftarrow \text{LLR} - \Delta I + \log\frac{\lambda_1(t^-)}{\lambda_0(t^-)}, \quad x_k \leftarrow x_k + q_j$$
 
 ### 3. Mathematical Guarantees
 - **Zero-Dependency Core:** Implemented using Python's native `math.expm1` and `math.log1p` to eliminate catastrophic floating-point cancellation.
@@ -74,27 +76,27 @@ $$x_k \leftarrow x_k + q_j$$
 
 | Contract | Purpose | Core Fields |
 |---|---|---|
-| `IssueAnalysis` | Structured extraction of raw text | `category`, `normalized_title`, `summary`, `affected_area`, `reproducible_details`, `confidence` |
-| `IssueComparison` | Pairwise duplicate/relatedness comparison | `relationship`, `evidence`, `matching_score`, `meaningful_differences`, `recommended_action` |
-| `CommunitySummary` | Synthesis of recurring grievances | `main_problems`, `recurring_themes`, `disagreements`, `evidence_backed_feedback` |
-| `DeveloperBrief` | Technical brief for maintainers | `problem_statement`, `expected_behavior`, `actual_behavior`, `impact`, `reproduction_steps` |
-| `MergeProposal` | Guarded deduplication proposal | `candidate_canonical_issue_id`, `proposed_duplicate_links`, `supporting_evidence`, `human_review_required=True` |
+| `GrievanceAnalysis` *(IssueAnalysis)* | Normalizes raw citizen reports across sectors | `category`, `normalized_title`, `summary`, `affected_sector`, `location_or_demographic`, `observed_friction`, `current_workarounds`, `confidence` |
+| `GrievanceComparison` *(IssueComparison)* | Compares reports across regions/sectors for shared root causes | `relationship`, `evidence`, `matching_score`, `meaningful_differences`, `recommended_action` |
+| `CommunitySummary` | Synthesizes voices across multiple submissions | `main_problems`, `recurring_themes`, `disagreements`, `evidence_backed_feedback` |
+| `BuilderBrief` *(DeveloperBrief)* | **Actionable problem brief for hackathons & projects** | `problem_statement`, `target_beneficiaries`, `current_ground_reality`, `impact`, `solution_opportunities`, `unresolved_questions` |
+| `CanonicalClusterProposal` *(MergeProposal)* | Clusters related grievances under an overarching problem | `candidate_canonical_problem_id`, `proposed_grievance_links`, `supporting_evidence`, `human_review_required=True` |
 
 ---
 
-## 🚀 Quickstart: Installing the SDK in MendSeed
+## 🚀 Quickstart: Using the SDK in MendSeed
 
 Install the lightweight SDK directly from GitHub into your MendSeed workspace:
 
 ```bash
-pip install "git+https://github.com/itsjustayush/mendseed-ai.git#subdirectory=sdk"
+pip install "git+https://github.com/MendSeed/ai.git#subdirectory=sdk"
 ```
 
 ### Usage in MendSeed Outbox Worker:
 
 ```python
 import os
-from mendseed_ai import MendSeedAIClient, QuietFlayEngine, IssueAnalysis
+from mendseed_ai import MendSeedAIClient, QuietFlayEngine, GrievanceAnalysis
 
 # 1. Initialize Client
 ai_client = MendSeedAIClient(
@@ -102,9 +104,10 @@ ai_client = MendSeedAIClient(
     api_key=os.environ["MENDSEED_AI_SECRET_KEY"]
 )
 
-# 2. Ingest & Analyze Report Asynchronously
-analysis: IssueAnalysis = await ai_client.analyze_report(
-    "Map locks up when zooming past level 16 on Android 13."
+# 2. Ingest & Analyze Citizen Grievance Asynchronously
+grievance: GrievanceAnalysis = await ai_client.analyze_grievance(
+    "In Kolar district, tomato farmers lose up to 40% of their harvest every June "
+    "due to lack of cold storage transit, forcing distress sales at Rs 3/kg."
 )
 
 # 3. Calculate QuietFlay Temporal Evidence Score (Zero Latency, Pure Python)
@@ -119,17 +122,16 @@ print(ranking)
 
 ## ☁️ Deploying the 24/7 Cloud API Server
 
-### Option A: Vercel Serverless (Recommended — Free & No Cold Spins)
+### Option A: Vercel Serverless (Recommended — 24/7 Free)
 1. Install the Vercel CLI: `npm i -g vercel`
 2. Change into the `server/` directory:
    ```bash
    cd server
    vercel
    ```
-3. Add your environment variables in the Vercel dashboard:
-   - `MENDSEED_AI_SECRET_KEY`: Your private API secret
+3. Set environment variables in the Vercel dashboard:
+   - `MENDSEED_AI_SECRET_KEY`: Your secret key from `.env`
    - `HF_TOKEN`: Hugging Face Write Token
-   - `HF_ENDPOINT_URL`: Your Hugging Face serverless or dedicated model endpoint URL
 
 ### Option B: Docker / Render / Cloud Run
 ```bash
@@ -146,5 +148,5 @@ All API calls require the `X-MendSeed-Key` header, validated with constant-time 
 curl -X POST https://your-domain.vercel.app/v1/analyze \
   -H "X-MendSeed-Key: your_secret_key" \
   -H "Content-Type: application/json" \
-  -d '{"text": "App crashes on launch when Bluetooth permissions are denied."}'
+  -d '{"text": "Sub-centre hospital at Dhankuta has no snakebite antivenom vials in stock."}'
 ```

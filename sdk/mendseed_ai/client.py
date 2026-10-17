@@ -8,8 +8,12 @@ from typing import Any, Dict, List, Optional
 import httpx
 
 from .contracts import (
+    BuilderBrief,
+    CanonicalClusterProposal,
     CommunitySummary,
     DeveloperBrief,
+    GrievanceAnalysis,
+    GrievanceComparison,
     IssueAnalysis,
     IssueComparison,
     MergeProposal,
@@ -18,7 +22,7 @@ from .contracts import (
 
 class MendSeedAIClient:
     """
-    Zero-ML Client SDK for communicating with the MendSeed AI Cloud Microservice.
+    Zero-ML Client SDK for communicating with the MendSeed Public Grievance AI Microservice.
     Uses async HTTP requests with X-MendSeed-Key header authentication.
     """
 
@@ -49,14 +53,14 @@ class MendSeedAIClient:
             resp.raise_for_status()
             return resp.json()
 
-    async def analyze_report(
+    async def analyze_grievance(
         self,
         raw_text: str,
         metadata: Optional[Dict[str, Any]] = None
-    ) -> IssueAnalysis:
+    ) -> GrievanceAnalysis:
         """
-        Submits raw community report text for structured extraction.
-        Returns validated IssueAnalysis.
+        Submits raw citizen grievance text for structured extraction.
+        Returns validated GrievanceAnalysis.
         """
         payload = {"text": raw_text, "metadata": metadata or {}}
         async with httpx.AsyncClient(timeout=self.timeout) as client:
@@ -66,16 +70,19 @@ class MendSeedAIClient:
                 json=payload
             )
             resp.raise_for_status()
-            return IssueAnalysis.model_validate(resp.json())
+            return GrievanceAnalysis.model_validate(resp.json())
 
-    async def compare_issues(
+    # Backward compatibility alias
+    analyze_report = analyze_grievance
+
+    async def compare_grievances(
         self,
         report_a: str,
         report_b: str
-    ) -> IssueComparison:
+    ) -> GrievanceComparison:
         """
-        Compares two issue reports to establish duplicate/related relationship.
-        Returns validated IssueComparison.
+        Compares two grievances to evaluate if they share root causes or are distinct.
+        Returns validated GrievanceComparison.
         """
         payload = {"report_a": report_a, "report_b": report_b}
         async with httpx.AsyncClient(timeout=self.timeout) as client:
@@ -85,7 +92,10 @@ class MendSeedAIClient:
                 json=payload
             )
             resp.raise_for_status()
-            return IssueComparison.model_validate(resp.json())
+            return GrievanceComparison.model_validate(resp.json())
+
+    # Backward compatibility alias
+    compare_issues = compare_grievances
 
     async def summarize_community(
         self,
@@ -93,7 +103,7 @@ class MendSeedAIClient:
         category: Optional[str] = None
     ) -> CommunitySummary:
         """
-        Synthesizes recurring pain points, themes, and disagreements across reports.
+        Synthesizes recurring pain points, themes, and evidence across public reports.
         Returns validated CommunitySummary.
         """
         payload = {"reports": reports, "category": category}
@@ -106,33 +116,36 @@ class MendSeedAIClient:
             resp.raise_for_status()
             return CommunitySummary.model_validate(resp.json())
 
-    async def generate_developer_brief(
+    async def generate_builder_brief(
         self,
-        issue_title: str,
+        problem_title: str,
         reports: List[str]
-    ) -> DeveloperBrief:
+    ) -> BuilderBrief:
         """
-        Generates an actionable developer brief for maintainers.
-        Returns validated DeveloperBrief.
+        Generates an actionable problem brief for project builders and hackathons.
+        Returns validated BuilderBrief.
         """
-        payload = {"title": issue_title, "reports": reports}
+        payload = {"title": problem_title, "reports": reports}
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             resp = await client.post(
-                f"{self.endpoint_url}/v1/developer-brief",
+                f"{self.endpoint_url}/v1/builder-brief",
                 headers=self.headers,
                 json=payload
             )
             resp.raise_for_status()
-            return DeveloperBrief.model_validate(resp.json())
+            return BuilderBrief.model_validate(resp.json())
+
+    # Backward compatibility alias
+    generate_developer_brief = generate_builder_brief
 
     async def find_duplicates(
         self,
         raw_text: str,
         candidates: List[Dict[str, str]]
-    ) -> MergeProposal:
+    ) -> CanonicalClusterProposal:
         """
-        Sends raw text and candidate canonical issues to evaluate potential duplicate merges.
-        Returns validated MergeProposal.
+        Evaluates whether a new grievance clusters with existing canonical problem statements.
+        Returns validated CanonicalClusterProposal.
         """
         payload = {"text": raw_text, "candidates": candidates}
         async with httpx.AsyncClient(timeout=self.timeout) as client:
@@ -142,4 +155,4 @@ class MendSeedAIClient:
                 json=payload
             )
             resp.raise_for_status()
-            return MergeProposal.model_validate(resp.json())
+            return CanonicalClusterProposal.model_validate(resp.json())
