@@ -1,0 +1,46 @@
+# Python byte code and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Environments
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+env/
+
+# Build & packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Model Checkpoints & Large Data
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.jsonl
+mendseed-qlora-checkpoints/
+checkpoint-*/
+
+# IDE & OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
