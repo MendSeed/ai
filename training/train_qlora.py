@@ -15,6 +15,7 @@ Key Capabilities:
 import argparse
 from datetime import datetime, timezone
 import hashlib
+import inspect
 import json
 import logging
 import os
@@ -47,67 +48,85 @@ def compute_file_sha256(filepath: str) -> str:
 def parse_args():
     parser = argparse.ArgumentParser(description="MendSeed AI QLoRA Training Pipeline")
     parser.add_argument(
-        "--train-file",
+        "--train-file", "--train_file",
         type=str,
         default=os.path.join(PARENT_DIR, "training", "data", "train.jsonl"),
         help="Path to training jsonl split"
     )
     parser.add_argument(
-        "--val-file",
+        "--val-file", "--val_file",
         type=str,
         default=os.path.join(PARENT_DIR, "training", "data", "val.jsonl"),
         help="Path to validation jsonl split"
     )
     parser.add_argument(
-        "--output-dir",
+        "--output-dir", "--output_dir",
         type=str,
         default=os.path.join(PARENT_DIR, "training", "checkpoints"),
         help="Output directory for checkpoints and training artifacts"
     )
     parser.add_argument(
-        "--base-model-id",
+        "--base-model-id", "--base_model_id",
         type=str,
         default=os.getenv("BASE_MODEL_ID", "Qwen/Qwen2.5-3B-Instruct"),
         help="Hugging Face base model identifier"
     )
     parser.add_argument(
-        "--base-model-revision",
+        "--base-model-revision", "--base_model_revision",
         type=str,
         default=os.getenv("BASE_MODEL_REVISION", "main"),
         help="Base model git commit revision"
     )
     parser.add_argument(
-        "--adapter-repo",
+        "--adapter-repo", "--adapter_repo",
         type=str,
         default=os.getenv("ADAPTER_REPO", "itsjustayush/mendseed-qwen2.5-3b-lora"),
         help="Target Hugging Face adapter repo"
     )
     parser.add_argument(
-        "--batch-size",
+        "--batch-size", "--batch_size",
         type=int,
         default=2,
         help="Per-device train batch size"
     )
     parser.add_argument(
-        "--grad-accum",
+        "--grad-accum", "--grad_accum",
         type=int,
         default=4,
         help="Gradient accumulation steps"
     )
     parser.add_argument(
-        "--learning-rate",
+        "--learning-rate", "--learning_rate",
         type=float,
         default=2e-4,
         help="Initial learning rate"
     )
     parser.add_argument(
-        "--max-steps",
+        "--warmup-ratio", "--warmup_ratio",
+        type=float,
+        default=0.05,
+        help="Warmup ratio for learning rate scheduler"
+    )
+    parser.add_argument(
+        "--fp16",
+        action="store_true",
+        default=True,
+        help="Enable FP16 mixed precision training (recommended for Tesla T4)"
+    )
+    parser.add_argument(
+        "--bf16",
+        action="store_true",
+        default=False,
+        help="Enable BF16 mixed precision training (requires Ampere A100/L4 or newer)"
+    )
+    parser.add_argument(
+        "--max-steps", "--max_steps",
         type=int,
         default=150,
         help="Maximum training steps"
     )
     parser.add_argument(
-        "--eval-steps",
+        "--eval-steps", "--eval_steps",
         type=int,
         default=15,
         help="Evaluation and checkpoint saving interval in steps"
@@ -119,7 +138,7 @@ def parse_args():
         help="Random seed for reproducibility"
     )
     parser.add_argument(
-        "--push-to-hub",
+        "--push-to-hub", "--push_to_hub",
         action="store_true",
         help="Upload fine-tuned adapter to Hugging Face Hub at completion"
     )
@@ -225,14 +244,22 @@ def run_training():
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"
 
-    logger.info(f"Loading base model {args.base_model_id} in 4-bit NF4...")
+    logger.info(f"Loading base model {args.base_model_id} in 4-bit NF4 with torch.float16 (T4/Turing hardware compatible)...")
     model = AutoModelForCausalLM.from_pretrained(
         args.base_model_id,
         revision=args.base_model_revision,
         quantization_config=bnb_config,
+        torch_dtype=torch.float16,
         device_map="auto"
     )
-    model = prepare_model_for_kbit_training(model)
+    try:
+        model = prepare_model_for_kbit_training(
+            model,
+            use_gradient_checkpointing=True,
+            gradient_checkpointing_kwargs={"use_reentrant": False}
+        )
+    except TypeError:
+        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
 
     peft_config = LoraConfig(
         r=16,
@@ -247,7 +274,7 @@ def run_training():
     )
 
     # Ingest and format dataset using Qwen's ChatML template
-    logger.info(f"Loading datasets...")
+    logger.info("Loading datasets...")
     train_dataset = load_dataset("json", data_files=args.train_file, split="train")
 
     def format_chat(row):
@@ -268,38 +295,86 @@ def run_training():
     # Training arguments with real validation tracking
     has_val = eval_formatted is not None and len(eval_formatted) > 0
 
-    training_args = TrainingArguments(
-        output_dir=args.output_dir,
-        per_device_train_batch_size=args.batch_size,
-        gradient_accumulation_steps=args.grad_accum,
-        learning_rate=args.learning_rate,
-        lr_scheduler_type="cosine",
-        warmup_ratio=0.1,
-        logging_steps=5,
-        max_steps=args.max_steps,
-        eval_strategy="steps" if has_val else "no",
-        eval_steps=args.eval_steps if has_val else None,
-        save_strategy="steps" if has_val else "no",
-        save_steps=args.eval_steps if has_val else None,
-        load_best_model_at_end=True if has_val else False,
-        metric_for_best_model="eval_loss" if has_val else None,
-        fp16=True,
-        bf16=False,
-        optim="paged_adamw_8bit",
-        seed=args.seed,
-        report_to="none"
-    )
+    # Dynamically select SFTConfig (trl >= 0.12.0) or TrainingArguments (legacy trl)
+    import trl
+    from trl import SFTTrainer
 
-    trainer = SFTTrainer(
-        model=model,
-        train_dataset=train_formatted,
-        eval_dataset=eval_formatted,
-        peft_config=peft_config,
-        dataset_text_field="text",
-        max_seq_length=1024,
-        processing_class=tokenizer,
-        args=training_args,
-    )
+    use_sft_config = hasattr(trl, "SFTConfig")
+    training_args_cls = getattr(trl, "SFTConfig", TrainingArguments)
+
+    sig = inspect.signature(training_args_cls.__init__)
+    supported_params = set(sig.parameters.keys())
+
+    # Universal warmup steps calculation (avoids warmup_ratio parameter deprecations)
+    calc_warmup_steps = max(1, int(args.max_steps * (args.warmup_ratio if args.warmup_ratio is not None else 0.05)))
+
+    args_dict = {
+        "output_dir": args.output_dir,
+        "per_device_train_batch_size": args.batch_size,
+        "gradient_accumulation_steps": args.grad_accum,
+        "learning_rate": args.learning_rate,
+        "lr_scheduler_type": "cosine",
+        "logging_steps": 5,
+        "max_steps": args.max_steps,
+        "fp16": args.fp16,
+        "bf16": args.bf16,
+        "optim": "paged_adamw_8bit",
+        "seed": args.seed,
+        "report_to": "none",
+    }
+
+    if "warmup_steps" in supported_params:
+        args_dict["warmup_steps"] = calc_warmup_steps
+    elif "warmup_ratio" in supported_params:
+        args_dict["warmup_ratio"] = args.warmup_ratio if args.warmup_ratio is not None else 0.05
+
+    # Strategy configuration for evaluation and checkpointing
+    if "eval_strategy" in supported_params:
+        args_dict["eval_strategy"] = "steps" if has_val else "no"
+    elif "evaluation_strategy" in supported_params:
+        args_dict["evaluation_strategy"] = "steps" if has_val else "no"
+
+    if has_val:
+        args_dict["eval_steps"] = args.eval_steps
+        args_dict["save_strategy"] = "steps"
+        args_dict["save_steps"] = args.eval_steps
+        args_dict["load_best_model_at_end"] = True
+        args_dict["metric_for_best_model"] = "eval_loss"
+
+    # In modern TRL (trl >= 0.12.0), dataset_text_field & max_seq_length belong in SFTConfig
+    if use_sft_config:
+        if "dataset_text_field" in supported_params:
+            args_dict["dataset_text_field"] = "text"
+        if "max_seq_length" in supported_params:
+            args_dict["max_seq_length"] = 1024
+
+    training_args = training_args_cls(**args_dict)
+
+    # Configure SFTTrainer kwargs safely according to its constructor signature
+    sft_sig = inspect.signature(SFTTrainer.__init__)
+    sft_params = set(sft_sig.parameters.keys())
+
+    trainer_kwargs = {
+        "model": model,
+        "train_dataset": train_formatted,
+        "eval_dataset": eval_formatted,
+        "peft_config": peft_config,
+        "args": training_args,
+    }
+
+    if "processing_class" in sft_params:
+        trainer_kwargs["processing_class"] = tokenizer
+    elif "tokenizer" in sft_params:
+        trainer_kwargs["tokenizer"] = tokenizer
+
+    # Pass dataset_text_field and max_seq_length to SFTTrainer only in legacy TRL
+    if not use_sft_config:
+        if "dataset_text_field" in sft_params:
+            trainer_kwargs["dataset_text_field"] = "text"
+        if "max_seq_length" in sft_params:
+            trainer_kwargs["max_seq_length"] = 1024
+
+    trainer = SFTTrainer(**trainer_kwargs)
 
     logger.info("Executing QLoRA fine-tuning...")
     train_result = trainer.train()
