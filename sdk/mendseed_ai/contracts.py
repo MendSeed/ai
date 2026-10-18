@@ -5,11 +5,11 @@ MendSeed captures and structures real-world problems faced by people across dive
 and packages them for builders, researchers, and hackathon teams seeking genuine problems to solve.
 """
 
-from typing import List, Literal, Optional
+from typing import Dict, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
-# Sector classifications for real-world grievances
+# Sector classifications for real-world grievances in MendSeed AI
 GrievanceSector = Literal[
     "Civic & Public Infrastructure",
     "Agriculture & Rural Development",
@@ -22,6 +22,47 @@ GrievanceSector = Literal[
     "Other Grievance"
 ]
 
+# Canonical mapping from MendSeed platform Category enums (src/types/index.ts)
+# to MendSeed AI GrievanceSector representations
+PLATFORM_CATEGORY_TO_SECTOR: Dict[str, GrievanceSector] = {
+    "PUBLIC_INFRASTRUCTURE": "Civic & Public Infrastructure",
+    "ENVIRONMENT": "Environment & Waste Management",
+    "TRANSPORTATION": "Transportation & Mobility",
+    "EDUCATION": "Education & Skilling",
+    "PUBLIC_SERVICES": "Public Services & Local Governance",
+    "EVERYDAY_LIFE": "Livelihoods & Daily Life",
+    "WORK_ORGANIZATIONS": "Livelihoods & Daily Life",
+    "WORKFLOWS_PRODUCTIVITY": "Livelihoods & Daily Life",
+    "SOFTWARE_APPS": "Other Grievance",
+    "DEV_TOOLS": "Other Grievance",
+    "ACCESSIBILITY": "Other Grievance",
+    "OTHER": "Other Grievance",
+}
+
+# Reverse mapping from MendSeed AI GrievanceSector to platform Category enums
+SECTOR_TO_PLATFORM_CATEGORY: Dict[str, str] = {
+    "Civic & Public Infrastructure": "PUBLIC_INFRASTRUCTURE",
+    "Agriculture & Rural Development": "ENVIRONMENT",
+    "Healthcare & Sanitation": "PUBLIC_SERVICES",
+    "Education & Skilling": "EDUCATION",
+    "Environment & Waste Management": "ENVIRONMENT",
+    "Transportation & Mobility": "TRANSPORTATION",
+    "Public Services & Local Governance": "PUBLIC_SERVICES",
+    "Livelihoods & Daily Life": "EVERYDAY_LIFE",
+    "Other Grievance": "OTHER",
+}
+
+
+def map_platform_category_to_sector(platform_category: str) -> GrievanceSector:
+    """Safely map a MendSeed platform category code to AI GrievanceSector."""
+    normalized = platform_category.strip().upper()
+    return PLATFORM_CATEGORY_TO_SECTOR.get(normalized, "Other Grievance")
+
+
+def map_sector_to_platform_category(sector: str) -> str:
+    """Safely map an AI GrievanceSector back to MendSeed platform Category enum."""
+    return SECTOR_TO_PLATFORM_CATEGORY.get(sector.strip(), "OTHER")
+
 
 class GrievanceAnalysis(BaseModel):
     """
@@ -30,6 +71,10 @@ class GrievanceAnalysis(BaseModel):
     """
     category: GrievanceSector = Field(
         description="Sector or domain of the real-world grievance"
+    )
+    platform_category: Optional[str] = Field(
+        default=None,
+        description="Canonical MendSeed platform Category enum (e.g. PUBLIC_INFRASTRUCTURE, ENVIRONMENT)"
     )
     normalized_title: str = Field(
         description="Concise, neutral title summarizing the ground reality problem"

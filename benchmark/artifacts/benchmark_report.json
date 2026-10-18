@@ -1,171 +1,240 @@
 {
+  "metadata": {
+    "timestamp_utc": "2026-10-18T11:52:35.787733+00:00",
+    "provider_type": "mock",
+    "base_model": "Qwen/Qwen2.5-3B-Instruct",
+    "base_model_revision": "main",
+    "adapter_id": "unconfigured",
+    "eval_dataset_path": "E:\\Projects\\ai\\benchmark\\data\\golden_eval_dataset.json",
+    "eval_dataset_sha256": "011c80ffe691604b2524cb6c6556076a65013e039a6af828e6ed918357223b7a",
+    "generation_settings": {
+      "temperature": 0.1,
+      "max_new_tokens": 512
+    }
+  },
   "evaluation_summary": {
     "total_test_cases": 60,
     "schema_integrity_pass_rate": "100.0%",
-    "sector_classification_accuracy": "60.7%",
-    "macro_precision": "65.9%",
-    "macro_recall": "60.9%",
-    "macro_f1": "61.3%",
-    "adversarial_robustness_rate": "100.0%"
+    "sector_classification_accuracy": "21.4%",
+    "macro_precision": "14.4%",
+    "macro_recall": "19.6%",
+    "macro_f1": "12.4%",
+    "adversarial_robustness_rate": "75.0%",
+    "fallback_rate": "0.0%",
+    "latency_mean_ms": 0.04
   },
   "classification_metrics": {
-    "accuracy": 0.6071,
-    "macro_precision": 0.659,
-    "macro_recall": 0.6086,
-    "macro_f1": 0.6126,
+    "total_test_cases": 60,
+    "standard_cases": 56,
+    "adversarial_cases": 4,
+    "accuracy": 0.2143,
+    "macro_precision": 0.1442,
+    "macro_recall": 0.1964,
+    "macro_f1": 0.1242,
     "schema_pass_rate": 1.0,
-    "adversarial_pass_rate": 1.0,
-    "confusion_matrix": [
-      [
-        6,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0
-      ],
-      [
-        0,
-        6,
-        0,
-        0,
-        0,
-        1,
-        0,
-        1
-      ],
-      [
-        0,
-        2,
-        4,
-        0,
-        0,
-        0,
-        0,
-        1
-      ],
-      [
-        0,
-        1,
-        0,
-        5,
-        0,
-        1,
-        0,
-        0
-      ],
-      [
-        0,
-        4,
-        0,
-        0,
-        3,
-        0,
-        0,
-        0
-      ],
-      [
-        0,
-        2,
-        1,
-        1,
-        0,
-        2,
-        0,
-        1
-      ],
-      [
-        0,
-        0,
-        0,
-        0,
-        2,
-        1,
-        3,
-        1
-      ],
-      [
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        5
-      ]
-    ],
+    "adversarial_robustness_rate": 0.75,
+    "fallback_rate": 0.0,
+    "latency_ms": {
+      "mean": 0.04,
+      "p95": 0.06
+    },
     "per_class_precision": [
       1.0,
-      0.4,
-      0.8,
-      0.8333,
-      0.6,
-      0.3333,
-      0.75,
-      0.5556
+      0.1538,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "per_class_recall": [
-      0.8571,
-      0.75,
       0.5714,
-      0.7143,
-      0.4286,
-      0.2857,
-      0.4286,
-      0.8333
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
     "per_class_f1": [
-      0.9231,
-      0.5217,
-      0.6667,
-      0.7692,
-      0.5,
-      0.3077,
-      0.5455,
-      0.6667
+      0.7273,
+      0.2667,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "confusion_matrix": [
+      [
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        8,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     ]
   },
-  "quietflay_benchmark": {
+  "quietfray_ranking_benchmark": {
+    "ranking_method": "measured_ndcg_at_10",
     "ndcg_results": {
-      "Regime A (Chronic Need)": {
-        "QuietFlay": 0.931,
-        "RawVotes": 0.18,
-        "WilsonScore": 0.22,
-        "RecencyDecay": 0.45
+      "QuietFray": 0.7501,
+      "RawVotes": 0.6209,
+      "WilsonScore": 0.6328,
+      "RecencyDecay": 0.7501
+    },
+    "regime_diagnostics": {
+      "Overall Ranked Feed (10 Candidates)": {
+        "QuietFray": 0.7501,
+        "RawVotes": 0.6209,
+        "WilsonScore": 0.6328,
+        "RecencyDecay": 0.7501
       },
-      "Regime B (Sybil Spike)": {
-        "QuietFlay": 1.0,
-        "RawVotes": 0.0,
-        "WilsonScore": 0.12,
-        "RecencyDecay": 0.38
+      "Chronic Weak Signal Defense": {
+        "QuietFray_score": 9.4766,
+        "QuietFray_rank_of_chronic": 3,
+        "RawVotes_rank_of_chronic": 3
       },
-      "Regime C (Legacy Bias)": {
-        "QuietFlay": 0.779,
-        "RawVotes": 0.275,
-        "WilsonScore": 0.31,
-        "RecencyDecay": 0.52
-      },
-      "Regime D (Chatter Noise)": {
-        "QuietFlay": 0.789,
-        "RawVotes": 0.046,
-        "WilsonScore": 0.15,
-        "RecencyDecay": 0.41
+      "Sybil Burst Suppression": {
+        "Sybil_burst_QuietFray_rank": 1,
+        "Sybil_burst_RawVotes_rank": 2
       }
     },
-    "sample_scores": {
-      "chronic_need": 0.4184,
-      "sybil_burst": 4.4512,
-      "legacy_monopoly": 0.0,
-      "social_chatter": 0.0961
-    }
+    "sample_candidate_rankings": [
+      {
+        "rank": 1,
+        "candidate": "Sybil Bot Burst (100 coordinated upvotes in 15 mins)",
+        "relevance": 0.0,
+        "quietfray_score": 9.4766
+      },
+      {
+        "rank": 2,
+        "candidate": "Recent Critical Healthcare Stockout (Primary health antivenom deficit)",
+        "relevance": 3.0,
+        "quietfray_score": 0.6885
+      },
+      {
+        "rank": 3,
+        "candidate": "Chronic Unmet Need (Persistent agricultural cold-chain failure)",
+        "relevance": 3.0,
+        "quietfray_score": 0.438
+      },
+      {
+        "rank": 4,
+        "candidate": "Recurring Municipal Sewage Seepage (Ward 14 weekly failure)",
+        "relevance": 3.0,
+        "quietfray_score": 0.3367
+      },
+      {
+        "rank": 5,
+        "candidate": "Transit Schedule Shift Friction (Factory workers bus timing)",
+        "relevance": 2.0,
+        "quietfray_score": 0.302
+      },
+      {
+        "rank": 6,
+        "candidate": "Social Chatter Noise (Low mark ambiguous complaints)",
+        "relevance": 1.0,
+        "quietfray_score": 0.0443
+      },
+      {
+        "rank": 7,
+        "candidate": "One-off Minor Query (Resolved question)",
+        "relevance": 0.0,
+        "quietfray_score": 0.0027
+      },
+      {
+        "rank": 8,
+        "candidate": "Legacy Inactive Monopoly (200 upvotes 60 days ago, zero activity since)",
+        "relevance": 0.0,
+        "quietfray_score": 0.0
+      }
+    ]
   },
-  "bias_variance_diagnostics": {
-    "optimal_checkpoint_step": 101,
-    "minimum_validation_loss": 0.587,
-    "recommended_max_steps": 75,
-    "overfitting_risk_assessment": "Low risk before step 75; steps >90 cause memorization of synthetic syntax without reasoning gain."
+  "training_history_status": {
+    "status": "NOT RUN",
+    "reason": "No GPU training log found. Fine-tuning metrics must be produced by a real GPU session (Google Colab / Kaggle / Cloud GPU). Simulated loss curves are disallowed.",
+    "train_steps": [],
+    "train_loss": [],
+    "val_steps": [],
+    "val_loss": [],
+    "optimal_step": null,
+    "min_val_loss": null
   }
 }

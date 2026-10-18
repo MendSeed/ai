@@ -1,0 +1,1034 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "MendSeed AI \u2014 Public Grievance Observatory & Problem Discovery Gateway",
+    "description": "Structures real-world citizen grievances across sectors (agriculture, civic, healthcare, education, mobility) into actionable problem briefs for builders and hackathon teams.",
+    "version": "0.2.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Root Info",
+        "description": "Service index and operational capabilities.",
+        "operationId": "root_info__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health Check",
+        "description": "Public liveness and readiness probe.\nDoes NOT leak secret configuration details or API token states.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analyze": {
+      "post": {
+        "tags": [
+          "Grievance Intelligence"
+        ],
+        "summary": "Analyze Report",
+        "description": "Extracts structured GrievanceAnalysis from raw citizen problem report.\nReturns model extraction or documented fallback.",
+        "operationId": "analyze_report_v1_analyze_post",
+        "parameters": [
+          {
+            "name": "x-mendseed-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Mendseed-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrievanceAnalysis"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/compare": {
+      "post": {
+        "tags": [
+          "Grievance Intelligence"
+        ],
+        "summary": "Compare Issues",
+        "description": "Compares two problem reports to evaluate if they share systemic causes or are distinct.",
+        "operationId": "compare_issues_v1_compare_post",
+        "parameters": [
+          {
+            "name": "x-mendseed-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Mendseed-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComparePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrievanceComparison"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/community-summary": {
+      "post": {
+        "tags": [
+          "Grievance Intelligence"
+        ],
+        "summary": "Summarize Community",
+        "description": "Synthesizes recurring grievances across multiple citizen reports in a region or sector.",
+        "operationId": "summarize_community_v1_community_summary_post",
+        "parameters": [
+          {
+            "name": "x-mendseed-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Mendseed-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommunitySummaryPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunitySummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/builder-brief": {
+      "post": {
+        "tags": [
+          "Builder & Hackathon Discovery"
+        ],
+        "summary": "Generate Builder Brief",
+        "description": "Generates an actionable problem brief for project creators, researchers,\nand hackathon participants looking for real-world problems to solve.",
+        "operationId": "generate_builder_brief_v1_builder_brief_post",
+        "parameters": [
+          {
+            "name": "x-mendseed-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Mendseed-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuilderBriefPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuilderBrief"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/propose-merge": {
+      "post": {
+        "tags": [
+          "Grievance Intelligence"
+        ],
+        "summary": "Propose Merge",
+        "description": "Evaluates whether an incoming citizen grievance clusters under a canonical problem umbrella.\nAlways enforces human_review_required=True.",
+        "operationId": "propose_merge_v1_propose_merge_post",
+        "parameters": [
+          {
+            "name": "x-mendseed-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Mendseed-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MergeProposalPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CanonicalClusterProposal"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/quietfray/evaluate": {
+      "post": {
+        "tags": [
+          "QuietFray Engine"
+        ],
+        "summary": "Evaluate Quietfray Branching Mass",
+        "description": "Computes dual-decay temporal branching mass (tau_f = 0.02 days, tau_s = 3.0 days).\nFilters out short-term viral spikes while identifying persistent unresolved friction.",
+        "operationId": "evaluate_quietfray_branching_mass_v1_quietfray_evaluate_post",
+        "parameters": [
+          {
+            "name": "x-mendseed-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Mendseed-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchingMassPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/quietfray/streaming-update": {
+      "post": {
+        "tags": [
+          "QuietFray Engine"
+        ],
+        "summary": "Quietfray Streaming Update",
+        "description": "Performs an O(1) online state recurrence update for a newly arrived vote or report\nwithout scanning historical records.",
+        "operationId": "quietfray_streaming_update_v1_quietfray_streaming_update_post",
+        "parameters": [
+          {
+            "name": "x-mendseed-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Mendseed-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StreamingUpdatePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BranchingMassPayload": {
+        "properties": {
+          "events": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "maxItems": 5000,
+            "title": "Events",
+            "description": "List of [timestamp_in_days, quality_weight_q] tuples"
+          },
+          "current_t": {
+            "type": "number",
+            "title": "Current T",
+            "description": "Current evaluation timestamp in days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "events",
+          "current_t"
+        ],
+        "title": "BranchingMassPayload"
+      },
+      "BuilderBrief": {
+        "properties": {
+          "problem_statement": {
+            "type": "string",
+            "title": "Problem Statement",
+            "description": "Precise articulation of the real-world friction to be solved"
+          },
+          "target_beneficiaries": {
+            "type": "string",
+            "title": "Target Beneficiaries",
+            "description": "Who benefits when this problem is solved (e.g., smallholder farmers, bus commuters)"
+          },
+          "current_ground_reality": {
+            "type": "string",
+            "title": "Current Ground Reality",
+            "description": "What currently happens on the ground and why existing options fall short"
+          },
+          "impact": {
+            "type": "string",
+            "title": "Impact",
+            "description": "Economic, health, time, or social toll caused by this problem"
+          },
+          "solution_opportunities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Solution Opportunities",
+            "description": "Actionable directions, project ideas, or hackathon concepts to address this problem"
+          },
+          "unresolved_questions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Unresolved Questions",
+            "description": "Key open field questions builders should investigate before designing a solution"
+          }
+        },
+        "type": "object",
+        "required": [
+          "problem_statement",
+          "target_beneficiaries",
+          "current_ground_reality",
+          "impact"
+        ],
+        "title": "BuilderBrief",
+        "description": "Actionable problem brief for builders, hackathon teams, and project creators\nlooking for real, validated problems to solve."
+      },
+      "BuilderBriefPayload": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Title",
+            "description": "Canonical real-world problem title"
+          },
+          "reports": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Reports",
+            "description": "Associated citizen reports to extract ground realities from"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "reports"
+        ],
+        "title": "BuilderBriefPayload"
+      },
+      "CanonicalClusterProposal": {
+        "properties": {
+          "candidate_canonical_problem_id": {
+            "type": "string",
+            "title": "Candidate Canonical Problem Id",
+            "description": "ID of the overarching canonical problem statement"
+          },
+          "proposed_grievance_links": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Proposed Grievance Links",
+            "description": "List of individual citizen grievance IDs to cluster under this problem"
+          },
+          "supporting_evidence": {
+            "type": "string",
+            "title": "Supporting Evidence",
+            "description": "Shared root causes, systemic connections, and field rationale"
+          },
+          "uncertainty_level": {
+            "type": "string",
+            "enum": [
+              "Low",
+              "Medium",
+              "High"
+            ],
+            "title": "Uncertainty Level",
+            "description": "Estimated uncertainty in the clustering proposal"
+          },
+          "human_review_required": {
+            "type": "boolean",
+            "title": "Human Review Required",
+            "description": "Human moderation is strictly mandatory before grouping public records",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "candidate_canonical_problem_id",
+          "supporting_evidence",
+          "uncertainty_level"
+        ],
+        "title": "CanonicalClusterProposal",
+        "description": "Proposed grouping of related grievances under a canonical problem umbrella.\nEnsures human review is always required before aggregating community records."
+      },
+      "CommunitySummary": {
+        "properties": {
+          "main_problems": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Main Problems",
+            "description": "Primary unresolved pain points reported across the group"
+          },
+          "recurring_themes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Recurring Themes",
+            "description": "Common contexts, conditions, or demographics repeatedly impacted"
+          },
+          "disagreements": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Disagreements",
+            "description": "Divergent community perspectives, conflicting observations, or disputed causes"
+          },
+          "evidence_backed_feedback": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evidence Backed Feedback",
+            "description": "Ground-truth quotes, reported data points, and direct evidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "main_problems",
+          "recurring_themes",
+          "evidence_backed_feedback"
+        ],
+        "title": "CommunitySummary",
+        "description": "Synthesized community voice across multiple reports in a sector or region.\nReveals common patterns for researchers and policy makers."
+      },
+      "CommunitySummaryPayload": {
+        "properties": {
+          "reports": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Reports",
+            "description": "List of related public reports to synthesize"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category",
+            "description": "Optional sector or category label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reports"
+        ],
+        "title": "CommunitySummaryPayload"
+      },
+      "ComparePayload": {
+        "properties": {
+          "report_a": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 3,
+            "title": "Report A",
+            "description": "First grievance text"
+          },
+          "report_b": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 3,
+            "title": "Report B",
+            "description": "Second grievance text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "report_a",
+          "report_b"
+        ],
+        "title": "ComparePayload"
+      },
+      "GrievanceAnalysis": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "Civic & Public Infrastructure",
+              "Agriculture & Rural Development",
+              "Healthcare & Sanitation",
+              "Education & Skilling",
+              "Environment & Waste Management",
+              "Transportation & Mobility",
+              "Public Services & Local Governance",
+              "Livelihoods & Daily Life",
+              "Other Grievance"
+            ],
+            "title": "Category",
+            "description": "Sector or domain of the real-world grievance"
+          },
+          "platform_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Platform Category",
+            "description": "Canonical MendSeed platform Category enum (e.g. PUBLIC_INFRASTRUCTURE, ENVIRONMENT)"
+          },
+          "normalized_title": {
+            "type": "string",
+            "title": "Normalized Title",
+            "description": "Concise, neutral title summarizing the ground reality problem"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary",
+            "description": "Clear 1-2 sentence distillation of the core problem reported"
+          },
+          "affected_sector": {
+            "type": "string",
+            "title": "Affected Sector",
+            "description": "Specific sector, industry, or public domain affected"
+          },
+          "location_or_demographic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Or Demographic",
+            "description": "Geographic region, community group, or demographic facing the problem"
+          },
+          "observed_friction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed Friction",
+            "description": "The specific breakdown, shortage, delay, or systemic friction observed"
+          },
+          "current_workarounds": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Workarounds",
+            "description": "Ad-hoc or painful workarounds people currently use to cope"
+          },
+          "missing_information": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing Information",
+            "description": "Critical ground details missing from the report needed to build a solution"
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "description": "Extraction confidence score"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "normalized_title",
+          "summary",
+          "affected_sector",
+          "confidence"
+        ],
+        "title": "GrievanceAnalysis",
+        "description": "Structured extraction of a raw citizen grievance or real-world problem.\nDistills informal, emotional, or fragmented community input into clear problem parameters."
+      },
+      "GrievanceComparison": {
+        "properties": {
+          "relationship": {
+            "type": "string",
+            "enum": [
+              "Same underlying problem",
+              "Related problem in same domain",
+              "Distinct problem",
+              "Insufficient information"
+            ],
+            "title": "Relationship",
+            "description": "Classified relationship between the new grievance and an existing problem"
+          },
+          "evidence": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evidence",
+            "description": "Shared real-world symptoms, bottlenecks, or failure modes observed"
+          },
+          "matching_score": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Matching Score",
+            "description": "Semantic similarity or compatibility score between grievances"
+          },
+          "meaningful_differences": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Meaningful Differences",
+            "description": "Differences in local context, demographic, root cause, or severity"
+          },
+          "recommended_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommended Action",
+            "description": "Proposed curation action (e.g., 'cluster_under_canonical', 'keep_distinct')"
+          }
+        },
+        "type": "object",
+        "required": [
+          "relationship",
+          "evidence",
+          "matching_score"
+        ],
+        "title": "GrievanceComparison",
+        "description": "Compares two community problem reports to identify shared systemic causes\nor distinct regional/domain variations."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MergeProposalPayload": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 3,
+            "title": "Text",
+            "description": "New incoming grievance report"
+          },
+          "candidates": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "maxItems": 25,
+            "minItems": 1,
+            "title": "Candidates",
+            "description": "Candidate canonical problem statements with 'id', 'title', and 'summary'"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "candidates"
+        ],
+        "title": "MergeProposalPayload"
+      },
+      "ReportPayload": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 3,
+            "title": "Text",
+            "description": "Raw problem report or citizen grievance"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata",
+            "description": "Safe metadata (region, district, category tags)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "ReportPayload"
+      },
+      "StreamingUpdatePayload": {
+        "properties": {
+          "current_state": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Current State",
+            "description": "Existing issue state {x_fast, x_slow, log_lr, last_t}"
+          },
+          "event_time_days": {
+            "type": "number",
+            "title": "Event Time Days",
+            "description": "Timestamp of the new event in days"
+          },
+          "event_mark": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Event Mark",
+            "description": "Quality mark q_j in [0, 1]"
+          },
+          "is_report": {
+            "type": "boolean",
+            "title": "Is Report",
+            "description": "True for problem report, False for upvote/downvote",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "current_state",
+          "event_time_days",
+          "event_mark"
+        ],
+        "title": "StreamingUpdatePayload"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

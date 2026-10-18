@@ -1,5 +1,5 @@
 """
-MendSeed AI SDK — Zero-ML Lightweight Client & QuietFlay Engine.
+MendSeed AI SDK — Zero-ML Lightweight Client & QuietFray Engine.
 Public Grievances & Problem Observatory for Builders and Hackathons.
 """
 
@@ -15,11 +15,15 @@ from .contracts import (
     DeveloperBrief,
     MergeProposal,
     GrievanceSector,
+    PLATFORM_CATEGORY_TO_SECTOR,
+    SECTOR_TO_PLATFORM_CATEGORY,
+    map_platform_category_to_sector,
+    map_sector_to_platform_category,
 )
-from .quietflay import QuietFlayEngine
+from .quietfray import QuietFrayEngine, QuietFlayEngine
 from .client import MendSeedAIClient
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "GrievanceAnalysis",
@@ -32,6 +36,11 @@ __all__ = [
     "DeveloperBrief",
     "MergeProposal",
     "GrievanceSector",
+    "PLATFORM_CATEGORY_TO_SECTOR",
+    "SECTOR_TO_PLATFORM_CATEGORY",
+    "map_platform_category_to_sector",
+    "map_sector_to_platform_category",
+    "QuietFrayEngine",
     "QuietFlayEngine",
     "MendSeedAIClient",
 ]

@@ -44,3 +44,4 @@ checkpoint-*/
 Thumbs.db
 .vscode/
 .idea/
+*.ipynb

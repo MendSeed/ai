@@ -4,7 +4,7 @@ Provides typed access to the remote 24/7 MendSeed AI FastAPI server,
 validating all responses against strict Pydantic contracts.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import httpx
 
 from .contracts import (
@@ -43,7 +43,7 @@ class MendSeedAIClient:
         self.headers = {
             "X-MendSeed-Key": self.api_key,
             "Content-Type": "application/json",
-            "User-Agent": "MendSeed-AI-Client/0.1.0"
+            "User-Agent": "MendSeed-AI-Client/0.2.0"
         }
 
     async def health_check(self) -> Dict[str, Any]:
@@ -156,3 +156,19 @@ class MendSeedAIClient:
             )
             resp.raise_for_status()
             return CanonicalClusterProposal.model_validate(resp.json())
+
+    async def evaluate_quietfray_branching(
+        self,
+        events: List[Tuple[float, float]],
+        current_t: float
+    ) -> Dict[str, float]:
+        """Queries remote gateway for QuietFray branching mass evaluation."""
+        payload = {"events": [[float(t), float(q)] for t, q in events], "current_t": current_t}
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            resp = await client.post(
+                f"{self.endpoint_url}/v1/quietfray/evaluate",
+                headers=self.headers,
+                json=payload
+            )
+            resp.raise_for_status()
+            return resp.json()
