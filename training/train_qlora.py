@@ -105,7 +105,7 @@ def train():
         lr_scheduler_type="cosine",
         warmup_ratio=0.1,
         logging_steps=5,
-        max_steps=100,
+        max_steps=75,  # Optimal checkpoint based on bias-variance benchmark to avoid overfitting
         fp16=True,
         bf16=False,
         optim="paged_adamw_8bit",
