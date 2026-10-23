@@ -2,7 +2,7 @@
   "metadata": {
     "timestamp_utc": "2026-10-18T11:52:35.787733+00:00",
     "provider_type": "mock",
-    "base_model": "Qwen/Qwen2.5-3B-Instruct",
+    "base_model": "Qwen/Qwen3-4B-Instruct-2507",
     "base_model_revision": "main",
     "adapter_id": "unconfigured",
     "eval_dataset_path": "E:\\Projects\\ai\\benchmark\\data\\golden_eval_dataset.json",

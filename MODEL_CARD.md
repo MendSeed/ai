@@ -2,7 +2,7 @@
 language:
 - en
 license: apache-2.0
-base_model: Qwen/Qwen2.5-3B-Instruct
+base_model: Qwen/Qwen3-4B-Instruct-2507
 tags:
 - mendseed
 - public-grievances
@@ -14,9 +14,9 @@ tags:
 pipeline_tag: text-generation
 ---
 
-# MendSeed AI — Qwen2.5-3B Grievance Intelligence Adapter Specification
+# MendSeed AI — Qwen3-4B Grievance Intelligence Adapter Specification
 
-This model card documents the target architecture, training configuration, evaluation methodology, and operational constraints for fine-tuning **`Qwen/Qwen2.5-3B-Instruct`** for **MendSeed**—a public grievance observatory and real-world problem discovery platform.
+This model card documents the target architecture, training configuration, evaluation methodology, and operational constraints for fine-tuning **`Qwen/Qwen3-4B-Instruct-2507`** for **MendSeed**—a public grievance observatory and real-world problem discovery platform.
 
 MendSeed structures ground-level citizen grievances across key sectors (agriculture, civic infrastructure, healthcare, education, logistics, sanitation, public services, daily livelihoods) into actionable problem briefs for builders, researchers, and hackathon teams.
 
@@ -24,7 +24,7 @@ MendSeed structures ground-level citizen grievances across key sectors (agricult
 
 ## Model Details
 
-- **Base Model:** `Qwen/Qwen2.5-3B-Instruct` (Apache 2.0)
+- **Base Model:** `Qwen/Qwen3-4B-Instruct-2507` (Apache 2.0)
 - **Adapter Type:** PEFT QLoRA (Rank $r=16$, Alpha $\alpha=32$, Dropout $0.05$)
 - **Target Modules:** All 7 linear projection layers (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`)
 - **Quantization:** 4-bit NormalFloat (NF4) with Double Quantization (`float16` compute dType)
@@ -75,7 +75,7 @@ pip install -e sdk/
 
 # 2. Configure credentials
 export HF_TOKEN="your_hugging_face_write_token"
-export BASE_MODEL_ID="Qwen/Qwen2.5-3B-Instruct"
+export BASE_MODEL_ID="Qwen/Qwen3-4B-Instruct-2507"
 
 # 3. Launch training with validation-based checkpointing
 python training/train_qlora.py \

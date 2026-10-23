@@ -39,7 +39,7 @@ Extracts structured grievance intelligence, friction statements, and maps both A
 POST /v1/analyze HTTP/1.1
 Host: 127.0.0.1:8000
 Content-Type: application/json
-X-MendSeed-Key: mendseed_production_key_default_123
+X-MendSeed-Key: <MENDSEED_AI_SECRET_KEY>
 
 {
   "text": "The primary healthcare clinic in Dhankuta has run completely out of snakebite antivenom during the monsoon peak season.",
@@ -85,7 +85,7 @@ Evaluates shared systemic root causes between two citizen grievance submissions.
 POST /v1/compare HTTP/1.1
 Host: 127.0.0.1:8000
 Content-Type: application/json
-X-MendSeed-Key: mendseed_production_key_default_123
+X-MendSeed-Key: <MENDSEED_AI_SECRET_KEY>
 
 {
   "report_a": "Rural feeder bus from Taluka stops running at 6 PM leaving garment factory workers stranded on the highway.",
@@ -119,7 +119,7 @@ Aggregates recurring patterns across multiple submissions in a district or categ
 POST /v1/community-summary HTTP/1.1
 Host: 127.0.0.1:8000
 Content-Type: application/json
-X-MendSeed-Key: mendseed_production_key_default_123
+X-MendSeed-Key: <MENDSEED_AI_SECRET_KEY>
 
 {
   "reports": [
@@ -159,7 +159,7 @@ Distills ground evidence into an actionable problem specification for builders, 
 POST /v1/builder-brief HTTP/1.1
 Host: 127.0.0.1:8000
 Content-Type: application/json
-X-MendSeed-Key: mendseed_production_key_default_123
+X-MendSeed-Key: <MENDSEED_AI_SECRET_KEY>
 
 {
   "title": "Decentralized Cold Storage for Smallholder Vegetable Farmers",
@@ -198,7 +198,7 @@ Proposes grouping of citizen reports under an overarching problem umbrella. Alwa
 POST /v1/propose-merge HTTP/1.1
 Host: 127.0.0.1:8000
 Content-Type: application/json
-X-MendSeed-Key: mendseed_production_key_default_123
+X-MendSeed-Key: <MENDSEED_AI_SECRET_KEY>
 
 {
   "text": "Frequent power outages at rural veterinary dispensary ruin stored livestock vaccines.",
@@ -234,7 +234,7 @@ X-MendSeed-Key: mendseed_production_key_default_123
 POST /v1/quietfray/evaluate HTTP/1.1
 Host: 127.0.0.1:8000
 Content-Type: application/json
-X-MendSeed-Key: mendseed_production_key_default_123
+X-MendSeed-Key: <MENDSEED_AI_SECRET_KEY>
 
 {
   "events": [
@@ -277,7 +277,7 @@ X-MendSeed-Key: mendseed_production_key_default_123
 - **Inference Provider Architecture**:
   - `HuggingFaceInferenceProvider` (`server/provider.py`): Connects to private Hugging Face Dedicated Inference Endpoint or local server.
   - `MockInferenceProvider` (`server/provider.py`): Fully deterministic, zero-network mock provider with programmable simulation modes (`success`, `timeout`, `model_loading`, `malformed_json`, `empty`).
-- **Base Model**: `Qwen/Qwen2.5-3B-Instruct`
+- **Base Model**: `Qwen/Qwen3-4B-Instruct-2507`
 - **Target Adapter**: `MendSeed/qwen2.5-3b-mendseed-qlora` (Revision: `a1b2c3d`)
 - **Adapter Safety Guard**: `REQUIRE_ADAPTER=true` prevents silent inference on raw untrained base weights.
 

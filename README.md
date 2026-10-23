@@ -155,7 +155,7 @@ To execute one reproducible fine-tuning run on a GPU node:
 pip install -r training/requirements.txt
 pip install -e sdk/
 
-export BASE_MODEL_ID="Qwen/Qwen2.5-3B-Instruct"
+export BASE_MODEL_ID="Qwen/Qwen3-4B-Instruct-2507"
 export HF_TOKEN="hf_your_token_here"
 
 # Execute training with validation checkpointing

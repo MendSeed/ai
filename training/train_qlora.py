@@ -68,7 +68,7 @@ def parse_args():
     parser.add_argument(
         "--base-model-id", "--base_model_id",
         type=str,
-        default=os.getenv("BASE_MODEL_ID", "Qwen/Qwen2.5-3B-Instruct"),
+        default=os.getenv("BASE_MODEL_ID", "Qwen/Qwen3-4B-Instruct-2507"),
         help="Hugging Face base model identifier"
     )
     parser.add_argument(
@@ -80,7 +80,7 @@ def parse_args():
     parser.add_argument(
         "--adapter-repo", "--adapter_repo",
         type=str,
-        default=os.getenv("ADAPTER_REPO", "itsjustayush/mendseed-qwen2.5-3b-lora"),
+        default=os.getenv("ADAPTER_REPO", "itsjustayush/mendseed-qwen3-4b-lora"),
         help="Target Hugging Face adapter repo"
     )
     parser.add_argument(

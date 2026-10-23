@@ -27,7 +27,7 @@ def test_model_config_requires_adapter_validation():
     # Valid without required adapter
     cfg_no_adapter = ModelConfig(
         provider_type="huggingface",
-        endpoint_url="https://api-inference.huggingface.co/models/Qwen/Qwen2.5-3B-Instruct",
+        endpoint_url="https://api-inference.huggingface.co/models/Qwen/Qwen3-4B-Instruct-2507",
         require_adapter=False
     )
     valid, msg = cfg_no_adapter.validate_configuration()
@@ -36,7 +36,7 @@ def test_model_config_requires_adapter_validation():
     # Invalid when adapter is required but empty
     cfg_missing_adapter = ModelConfig(
         provider_type="huggingface",
-        endpoint_url="https://api-inference.huggingface.co/models/Qwen/Qwen2.5-3B-Instruct",
+        endpoint_url="https://api-inference.huggingface.co/models/Qwen/Qwen3-4B-Instruct-2507",
         adapter_id=None,
         require_adapter=True
     )

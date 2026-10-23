@@ -26,7 +26,7 @@ logger = logging.getLogger("mendseed_ai.provider")
 class ModelConfig:
     """Explicit configuration for inference model and endpoint."""
     provider_type: Literal["huggingface", "custom_endpoint", "mock", "none"] = "huggingface"
-    base_model: str = "Qwen/Qwen2.5-3B-Instruct"
+    base_model: str = "Qwen/Qwen3-4B-Instruct-2507"
     adapter_id: Optional[str] = None
     adapter_revision: Optional[str] = None
     endpoint_url: Optional[str] = None
@@ -40,7 +40,7 @@ class ModelConfig:
     def from_env(cls) -> "ModelConfig":
         """Builds explicit model configuration from environment variables."""
         provider = os.getenv("MODEL_PROVIDER", "huggingface").lower()
-        base_model = os.getenv("BASE_MODEL", "Qwen/Qwen2.5-3B-Instruct")
+        base_model = os.getenv("BASE_MODEL", "Qwen/Qwen3-4B-Instruct-2507")
         adapter_id = os.getenv("ADAPTER_ID") or os.getenv("ADAPTER_REPO")
         adapter_revision = os.getenv("ADAPTER_REVISION")
         endpoint_url = os.getenv("HF_ENDPOINT_URL") or os.getenv("INFERENCE_ENDPOINT_URL")

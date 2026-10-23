@@ -16,7 +16,7 @@
   1. *Small Training/Validation Volume:* The current training dataset has 7 synthetic examples. A robust evaluation requires a comprehensive test suite (at least 50+ diverse, multi-sector scenarios including edge cases and adversarial inputs) to accurately test precision, recall, and generalization.
   2. *Lack of Visual Benchmark Proof:* We need concrete, visual charts (Confusion Matrices, Precision-Recall curves, Loss & Bias-Variance diagnostics, QuietFlay NDCG comparisons) so stakeholders can visibly verify model performance.
   3. *Adversarial Robustness:* How does the system handle prompt injections, gibberish inputs, duplicate spam bursts, or ambiguous grievances? We must build explicit stress tests.
-  4. *Hugging Face Synchronization:* Ensure the repository `itsjustayush/mendseed-qwen2.5-3b-lora` exists, is authenticated with `HF_TOKEN`, and is ready for seamless model upload and inference.
+  4. *Hugging Face Synchronization:* Ensure the repository `itsjustayush/mendseed-qwen3-4b-lora` exists, is authenticated with `HF_TOKEN`, and is ready for seamless model upload and inference.
 
 ---
 
@@ -37,7 +37,7 @@
     4. `bias_variance_loss_curves.png`
 - [ ] **Step 4: Cloud GPU Fine-Tuning & Weight Push**
   - Execute QLoRA training for 75 steps (optimal early stopping checkpoint).
-  - Push trained LoRA adapter to `itsjustayush/mendseed-qwen2.5-3b-lora`.
+  - Push trained LoRA adapter to `itsjustayush/mendseed-qwen3-4b-lora`.
 
 ---
 
@@ -49,8 +49,8 @@
 - **Why it failed on Transportation (F1 = 30.8%) & Environment (F1 = 50.0%):**
   Real grievances are inherently interconnected. When a citizen reports:
   *"Our village school bus cannot reach children because the road culvert broke and sewage flooded both the approach lane and the hospital approach"*,
-  it contains keywords from education, transport, civic infrastructure, and healthcare. A keyword filter gets confused, whereas an instruction-tuned LLM (Qwen2.5-3B) synthesizes root-cause intent (the road culvert is the foundational civic failure).
-- **Actionable Conclusion:** Fine-tuning Qwen2.5-3B on our multi-sector dataset is strictly necessary. The fine-tuned LLM will raise classification accuracy from ~61% to >92%.
+  it contains keywords from education, transport, civic infrastructure, and healthcare. A keyword filter gets confused, whereas an instruction-tuned LLM (Qwen3-4B) synthesizes root-cause intent (the road culvert is the foundational civic failure).
+- **Actionable Conclusion:** Fine-tuning Qwen3-4B on our multi-sector dataset is strictly necessary. The fine-tuned LLM will raise classification accuracy from ~61% to >92%.
 
 ### Critique 2: QuietFlay v0.1 Superiority Over Raw Voting
 - **Regime A (Chronic Unmet Need):** QuietFlay scores NDCG@10 of **0.931** compared to **0.180** for raw votes. An issue with only 5 reports over 14 days is correctly recognized as persistent community suffering, whereas raw vote counters ignore it.
